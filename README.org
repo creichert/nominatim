@@ -1,0 +1,20 @@
+#+AUTHOR: Christopher Reichert
+#+TITLE: Haskell Library and Command-Line Interface to Nominatim
+
+
+https://travis-ci.org/creichert/nominatim.svg?branch=master
+
+#+BEGIN_SRC haskell
+{-# LANGUAGE OverloadedStrings #-}
+
+import Web.Nominatim
+
+main :: IO ()
+  let hdrs = [("User-Agent", BL.pack "Nominatim Client")]
+  nominatim hdrs [ Format Json
+                 , Query "1234 Awesome Dr, Houston, TX"
+                 , AddressDetails True
+                 , Limit 10
+                 ]
+
+#+END_SRC
