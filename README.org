@@ -2,7 +2,7 @@
 #+TITLE: Haskell Library and Command-Line Interface to Nominatim
 
 
-https://travis-ci.org/creichert/nominatim.svg?branch=master
+[[https://travis-ci.org/creichert/nominatim.svg?branch=master]]
 
 #+BEGIN_SRC haskell
 {-# LANGUAGE OverloadedStrings #-}
