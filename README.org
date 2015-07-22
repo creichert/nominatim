@@ -10,6 +10,7 @@
 import Web.Nominatim
 
 main :: IO ()
+main = do
   let hdrs = [("User-Agent", BL.pack "Nominatim Client")]
   nominatim hdrs [ Format Json
                  , Query "1234 Awesome Dr, Houston, TX"
