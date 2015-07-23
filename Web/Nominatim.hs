@@ -13,21 +13,22 @@ module Web.Nominatim
        ) where
 
 import           Control.Applicative
-import           Control.Exception    as E
+import           Control.Exception      as E
 import           Control.Lens
 import           Control.Monad
-import           Data.Aeson           as A (FromJSON (..), ToJSON (..),
-                                            Value (..), decode, eitherDecode,
-                                            parseJSON, (.:), (.:?))
-import           Data.ByteString.Lazy (ByteString)
-import           Data.Foldable        (Foldable)
-import qualified Data.Foldable        as F
-import qualified Data.List            as L
+import           Control.Monad.IO.Class
+import           Data.Aeson             as A (FromJSON (..), ToJSON (..),
+                                              Value (..), decode, eitherDecode,
+                                              parseJSON, (.:), (.:?))
+import           Data.ByteString.Lazy   (ByteString)
+import           Data.Foldable          (Foldable)
+import qualified Data.Foldable          as F
+import qualified Data.List              as L
 import           Data.Maybe
-import           Data.Monoid          ((<>))
-import           Data.Text            (Text)
-import qualified Data.Text            as T
-import           Network.HTTP.Client  (HttpException (..))
+import           Data.Monoid            ((<>))
+import           Data.Text              (Text)
+import qualified Data.Text              as T
+import           Network.HTTP.Client    (HttpException (..))
 import           Network.Wreq
 
 
@@ -267,7 +268,7 @@ urlEncodeSimple = T.replace " " "+"
 
 
 nominatim
-  :: Foldable t => [Header] -> t RequestParameter -> IO [Place]
+  :: (MonadIO m, Foldable t) => [Header] -> t RequestParameter -> m [Place]
 nominatim hdrs params = do
   nominatimLbs hdrs params
     >>= return . fromMaybe [] . A.decode
@@ -276,7 +277,7 @@ nominatim hdrs params = do
 -- | Call nominatim and retrieve the results as a
 -- raw bytestring
 nominatimLbs
-  :: Foldable t => [Header] -> t RequestParameter -> IO ByteString
+  :: (MonadIO m, Foldable t) => [Header] -> t RequestParameter -> m ByteString
 nominatimLbs hdrs params = do
   let opts = F.foldl (\acc p -> acc & createParam p) defaults params
   callNominatim opts
@@ -286,7 +287,7 @@ nominatimLbs hdrs params = do
 --
 -- No options are passed to the nominatim API and a query
 -- is made using the address
-nominatimSimple :: Text -> IO ByteString
+nominatimSimple :: MonadIO m => Text -> m ByteString
 nominatimSimple address = do
     let opts = defaults & param "format"         .~ ["json"]
                         & param "limit"          .~ ["1"]
@@ -295,9 +296,9 @@ nominatimSimple address = do
     callNominatim opts
 
 
-callNominatim :: Options -> IO ByteString
+callNominatim :: MonadIO m => Options -> m ByteString
 callNominatim opts = do
-    r <- getNominatimWith opts `E.catch` handler
+    r <- liftIO $ getNominatimWith opts `E.catch` handler
     return $ r ^. responseBody
   where
     getNominatimWith = flip getWith "http://nominatim.openstreetmap.org/search"
