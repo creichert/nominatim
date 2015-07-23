@@ -3,10 +3,12 @@
 
 module Web.Nominatim
        (
-         RequestFormat(..)
+         Place(..)
+       , RequestFormat(..)
        , RequestParameter(..)
 
        , nominatim
+       , nominatimLbs
        , nominatimSimple
        ) where
 
@@ -14,12 +16,14 @@ import           Control.Applicative
 import           Control.Exception    as E
 import           Control.Lens
 import           Control.Monad
-import           Data.Aeson           (FromJSON (..), ToJSON (..), Value (..),
-                                       eitherDecode, parseJSON, (.:), (.:?))
+import           Data.Aeson           as A (FromJSON (..), ToJSON (..),
+                                            Value (..), decode, eitherDecode,
+                                            parseJSON, (.:), (.:?))
 import           Data.ByteString.Lazy (ByteString)
 import           Data.Foldable        (Foldable)
 import qualified Data.Foldable        as F
 import qualified Data.List            as L
+import           Data.Maybe
 import           Data.Monoid          ((<>))
 import           Data.Text            (Text)
 import qualified Data.Text            as T
@@ -263,13 +267,25 @@ urlEncodeSimple = T.replace " " "+"
 
 
 nominatim
-  :: Foldable t => [Header] -> t RequestParameter -> IO ByteString
+  :: Foldable t => [Header] -> t RequestParameter -> IO [Place]
 nominatim hdrs params = do
-  let opts = F.foldl (\acc p -> acc & (createParam p)) defaults params
+  nominatimLbs hdrs params
+    >>= return . fromMaybe [] . A.decode
+
+
+-- | Call nominatim and retrieve the results as a
+-- raw bytestring
+nominatimLbs
+  :: Foldable t => [Header] -> t RequestParameter -> IO ByteString
+nominatimLbs hdrs params = do
+  let opts = F.foldl (\acc p -> acc & createParam p) defaults params
   callNominatim opts
 
 
--- | Send a request to nominatim
+-- | Send a request to nominatim using a simple query string
+--
+-- No options are passed to the nominatim API and a query
+-- is made using the address
 nominatimSimple :: Text -> IO ByteString
 nominatimSimple address = do
     let opts = defaults & param "format"         .~ ["json"]

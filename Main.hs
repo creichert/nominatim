@@ -53,9 +53,9 @@ nominatimRun NominatimCli{..} = do
              , Limit (fromMaybe 10 limit)
              ] ++ (maybe [] (\e -> [ Email (T.pack e) ]) email)
 
-  r <- nominatim [("User-Agent", BL.pack ua)] opts
-
+  r <- nominatimLbs [("User-Agent", BL.pack ua)] opts
   putStrLn $ BL.unpack r
+
   -- TODO support more stdout output formats
   -- case returnAs of
   --   Json    -> -- print (eitherDecode r :: Either String [Place])
