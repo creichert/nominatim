@@ -303,6 +303,8 @@ callNominatim opts = do
   where
     getNominatimWith = flip getWith "http://nominatim.openstreetmap.org/search"
     -- TODO handle specific nominatim error cases
+    handler :: HttpException -> IO a
     handler e@(StatusCodeException s _ _)
       --- | s ^. statusCode == 400 = error "ill formatted request"
       | otherwise              = throwIO e
+    handler e                  = throwIO e
