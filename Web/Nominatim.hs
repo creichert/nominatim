@@ -28,7 +28,7 @@ import           Data.Maybe
 import           Data.Monoid            ((<>))
 import           Data.Text              (Text)
 import qualified Data.Text              as T
-import           Network.HTTP.Client    (HttpException (..))
+import           Network.HTTP.Client    (HttpException (..), HttpExceptionContent (StatusCodeException))
 import           Network.Wreq
 
 
@@ -304,7 +304,7 @@ callNominatim opts = do
     getNominatimWith = flip getWith "http://nominatim.openstreetmap.org/search"
     -- TODO handle specific nominatim error cases
     handler :: HttpException -> IO a
-    handler e@(StatusCodeException s _ _)
+    handler e@(HttpExceptionRequest _ (StatusCodeException _ _))
       --- | s ^. statusCode == 400 = error "ill formatted request"
       | otherwise              = throwIO e
     handler e                  = throwIO e
