@@ -1,5 +1,11 @@
-flags: {}
+
+resolver: lts-17.8
+
+#extra-deps:
+#  - lens-4.19.2
+#  - aeson-1.5.6.0
+#  - http-client-0.6.4
+#  - wreq-0.5.3.3
+
 packages:
-- '.'
-extra-deps: []
-resolver: lts-13.12
+  - '.'

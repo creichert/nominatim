@@ -12,20 +12,16 @@ module Web.Nominatim
        , nominatimSimple
        ) where
 
-import           Control.Applicative
 import           Control.Exception      as E
 import           Control.Lens
 import           Control.Monad
 import           Control.Monad.IO.Class
-import           Data.Aeson             as A (FromJSON (..), ToJSON (..),
-                                              Value (..), decode, eitherDecode,
+import           Data.Aeson             as A (FromJSON (..), Value (..), decode,
                                               parseJSON, (.:), (.:?))
 import           Data.ByteString.Lazy   (ByteString)
-import           Data.Foldable          (Foldable)
 import qualified Data.Foldable          as F
 import qualified Data.List              as L
 import           Data.Maybe
-import           Data.Monoid            ((<>))
 import           Data.Text              (Text)
 import qualified Data.Text              as T
 import           Network.HTTP.Client    (HttpException (..), HttpExceptionContent (StatusCodeException))

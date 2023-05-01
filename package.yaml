@@ -1,0 +1,31 @@
+name: nominatim
+version: '0.1.0.1'
+synopsis: Haskell Nominatim API Client
+description: Haskell Nominatim API Client
+license: MIT
+category: Web
+copyright: (c) 2014-2023 Christopher Reichert
+
+dependencies:
+  - base
+  - aeson
+  - bytestring
+  - text
+  - transformers
+  - http-client
+  - wreq
+  - lens
+  - lens-aeson
+
+library:
+  source-dirs: src/
+  exposed-modules:
+    - Web.Nominatim
+
+executables:
+  nominatim:
+    main: Main.hs
+    source-dirs: .
+    dependencies:
+      - nominatim
+      - optparse-applicative
